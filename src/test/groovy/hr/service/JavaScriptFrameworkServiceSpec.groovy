@@ -88,4 +88,27 @@ class JavaScriptFrameworkServiceSpec extends Specification {
         thrown(JavaScriptFrameworkNotFoundException)
     }
 
+    def "Existing JS framework should be deleted"() {
+        when:
+        javaScriptFrameworkService.deleteJavascriptFramework(5)
+
+        then:
+        1 * javaScriptFrameworkRepositoryMock.deleteById(5)
+        //
+        1 * javaScriptFrameworkRepositoryMock.existsById(5) >> true
+    }
+
+    def "Non-existing JS framework shouldn't be deleted"() {
+        when:
+        javaScriptFrameworkService.deleteJavascriptFramework(5)
+
+        then:
+        0 * javaScriptFrameworkRepositoryMock.deleteById(_)
+        //
+        1 * javaScriptFrameworkRepositoryMock.existsById(5) >> false
+
+        and: "Exception should be thrown"
+        thrown(JavaScriptFrameworkNotFoundException)
+    }
+
 }

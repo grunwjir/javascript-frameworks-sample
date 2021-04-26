@@ -49,7 +49,8 @@ public class JavaScriptFrameworkServiceImpl implements JavaScriptFrameworkServic
         boolean exists = javaScriptFrameworkRepository.existsById(input.getId());
 
         if (!exists) {
-            throw new JavaScriptFrameworkNotFoundException("JavaScript framework ID: " + input.getId() + "doesn't exist");
+            throw new JavaScriptFrameworkNotFoundException("JavaScript framework ID: " + input.getId() + "doesn't " +
+                    "exist");
         }
 
         // map versions
@@ -60,6 +61,18 @@ public class JavaScriptFrameworkServiceImpl implements JavaScriptFrameworkServic
 
         // persist
         return javaScriptFrameworkRepository.save(framework);
+    }
+
+    @Override
+    @Transactional
+    public void deleteJavascriptFramework(Long id) {
+        boolean exists = javaScriptFrameworkRepository.existsById(id);
+
+        if (!exists) {
+            throw new JavaScriptFrameworkNotFoundException("JavaScript framework ID: " + id + "doesn't exist");
+        }
+
+        javaScriptFrameworkRepository.deleteById(id);
     }
 
     /**

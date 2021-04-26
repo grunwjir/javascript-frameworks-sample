@@ -119,6 +119,28 @@ class JavaScriptFrameworkControllerSpec extends Specification {
         )
 
         then:
-        results.andExpect(status().isBadRequest())
+        results.andExpect(status().isNotFound())
+    }
+
+    def "Framework should be deleted"() {
+        given:
+        javaScriptFrameworkService.deleteJavascriptFramework(5)
+
+        when:
+        def results = mvc.perform(delete("/frameworks/5"))
+
+        then:
+        results.andExpect(status().isNoContent())
+    }
+
+    def "Framework shouldn't be deleted - not exists"() {
+        given:
+        javaScriptFrameworkService.deleteJavascriptFramework(5) >> { throw new JavaScriptFrameworkNotFoundException("Doesn't exist") }
+
+        when:
+        def results = mvc.perform(delete("/frameworks/5"))
+
+        then:
+        results.andExpect(status().isNotFound())
     }
 }

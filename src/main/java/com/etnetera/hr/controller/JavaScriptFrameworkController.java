@@ -1,14 +1,18 @@
 package com.etnetera.hr.controller;
 
+import com.etnetera.hr.data.JavaScriptFrameworkIn;
 import com.etnetera.hr.data.JavaScriptFrameworkOut;
+import com.etnetera.hr.model.JavaScriptFramework;
+import com.etnetera.hr.model.JavaScriptFrameworkNotFoundException;
 import com.etnetera.hr.service.JavaScriptFrameworkService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,6 +35,28 @@ public class JavaScriptFrameworkController {
                 .stream()
                 .map(JavaScriptFrameworkOut::new)
                 .collect(Collectors.toList());
+    }
+
+    @Operation(summary = "Creates new JavaScript framework and their versions")
+    @PostMapping(value = "/frameworks")
+    @ResponseStatus(HttpStatus.CREATED)
+    public JavaScriptFrameworkOut createFramework(@RequestBody @Valid JavaScriptFrameworkIn javaScriptFramework) {
+        JavaScriptFramework created = javaScriptFrameworkService.createJavascriptFramework(javaScriptFramework);
+
+        return new JavaScriptFrameworkOut(created);
+    }
+
+    @Operation(summary = "Updates existing JavaScript framework and their versions")
+    @PutMapping(value = "/frameworks")
+    public JavaScriptFrameworkOut updateFramework(@RequestBody @Valid JavaScriptFrameworkIn javaScriptFramework) {
+        try {
+            JavaScriptFramework created = javaScriptFrameworkService.updateJavascriptFramework(javaScriptFramework);
+            return new JavaScriptFrameworkOut(created);
+        } catch (JavaScriptFrameworkNotFoundException ex) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "JavaScript framework ID: " + javaScriptFramework.getId() +
+                    " not exists", ex);
+        }
     }
 
 }

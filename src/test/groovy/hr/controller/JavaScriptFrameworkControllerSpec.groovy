@@ -2,8 +2,10 @@ package hr.controller
 
 import com.etnetera.hr.Application
 import com.etnetera.hr.controller.JavaScriptFrameworkController
+import com.etnetera.hr.data.JavaScriptFrameworkIn
 import com.etnetera.hr.model.HypeLevel
 import com.etnetera.hr.model.JavaScriptFramework
+import com.etnetera.hr.model.JavaScriptFrameworkNotFoundException
 import com.etnetera.hr.model.JavaScriptFrameworkVersion
 import com.etnetera.hr.service.JavaScriptFrameworkServiceImpl
 import org.spockframework.spring.SpringBean
@@ -16,7 +18,7 @@ import spock.lang.Specification
 
 import java.time.LocalDate
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 
 /**
@@ -60,5 +62,63 @@ class JavaScriptFrameworkControllerSpec extends Specification {
         and: "Second framework check"
         results.andExpect(jsonPath('$[1].name').value("Non-released-JS-Framework"))
         results.andExpect(jsonPath('$[1].versions.length()').value(0))
+    }
+
+    def "Framework should be created"() {
+        given:
+        javaScriptFrameworkService.createJavascriptFramework(_ as JavaScriptFrameworkIn) >> new JavaScriptFramework(versions: [])
+
+        when:
+        def results = mvc.perform(post("/frameworks")
+                .content('{"name": "Vue.js", "versions": [{"version": "4.48.5", "deprecationDate": "2050-12-20", "hypeLevel": "HIGH"}]}')
+                .contentType(MediaType.APPLICATION_JSON)
+        )
+
+        then:
+        results.andExpect(status().isCreated())
+        results.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+    }
+
+    def "Framework shouldn't be created - missing required field 'name'"() {
+        given:
+        javaScriptFrameworkService.createJavascriptFramework(_ as JavaScriptFrameworkIn) >> new JavaScriptFramework(versions: [])
+
+        when:
+        def results = mvc.perform(post("/frameworks")
+                .content('{"versions": [{"version": "4.48.5", "deprecationDate": "2050-12-20", "hypeLevel": "HIGH"}]}')
+                .contentType(MediaType.APPLICATION_JSON)
+        )
+
+        then:
+        results.andExpect(status().isBadRequest())
+    }
+
+    def "Framework should be updated"() {
+        given:
+        javaScriptFrameworkService.updateJavascriptFramework({ it.id == 5 } as JavaScriptFrameworkIn) >> new JavaScriptFramework(versions: [])
+
+        when:
+        def results = mvc.perform(put("/frameworks")
+                .content('{"id": 5, "name": "Vue.js", "versions": [{"version": "4.48.5", "deprecationDate": "2050-12-20", "hypeLevel": "HIGH"}]}')
+                .contentType(MediaType.APPLICATION_JSON)
+        )
+
+        then:
+        results.andExpect(status().isOk())
+        results.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+    }
+
+    def "Framework shouldn't be updated - not exists"() {
+        given:
+        javaScriptFrameworkService.updateJavascriptFramework({ it.id == 5 } as JavaScriptFrameworkIn) >> { throw new JavaScriptFrameworkNotFoundException("Doesn't exist") }
+
+        when:
+        def results = mvc.perform(put("/frameworks")
+                .content('{"id": 5, "name": "Vue.js", "versions": [{"version": "4.48.5", "deprecationDate": "2050-12-20", "hypeLevel": "HIGH"}]}')
+                .contentType(MediaType.APPLICATION_JSON)
+        )
+
+        then:
+        results.andExpect(status().isBadRequest())
     }
 }

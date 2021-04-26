@@ -1,5 +1,6 @@
 package com.etnetera.hr.model;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -17,6 +18,7 @@ import java.util.List;
 @ToString
 @Getter
 @NoArgsConstructor
+@EqualsAndHashCode
 public class JavaScriptFramework {
 
     /**

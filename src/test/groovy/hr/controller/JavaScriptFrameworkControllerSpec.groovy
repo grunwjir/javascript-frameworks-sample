@@ -143,4 +143,26 @@ class JavaScriptFrameworkControllerSpec extends Specification {
         then:
         results.andExpect(status().isNotFound())
     }
+
+    def "Should search by the given parameter"() {
+        given:
+        javaScriptFrameworkService.searchJavaScriptFrameworks("vue") >> [new JavaScriptFramework(versions: []),
+                                                                         new JavaScriptFramework(versions: [])]
+
+        when:
+        def results = mvc.perform(get("/frameworks/search?name=vue"))
+
+        then:
+        results.andExpect(status().isOk())
+        results.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        results.andExpect(jsonPath('$.length()').value(2))
+    }
+
+    def "Shouldn't search - missing name parameter"() {
+        when:
+        def results = mvc.perform(get("/frameworks/search"))
+
+        then:
+        results.andExpect(status().isBadRequest())
+    }
 }

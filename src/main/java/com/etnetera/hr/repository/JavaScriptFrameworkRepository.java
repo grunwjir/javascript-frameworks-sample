@@ -18,4 +18,11 @@ public interface JavaScriptFrameworkRepository extends CrudRepository<JavaScript
     @Override
     List<JavaScriptFramework> findAll();
 
+    /**
+     * Finds frameworks which name contains the given string value.
+     *
+     * @param name searching framework name
+     * @return list of frameworks
+     */
+    List<JavaScriptFramework> findByNameContainingIgnoreCase(String name);
 }

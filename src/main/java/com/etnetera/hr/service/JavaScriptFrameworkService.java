@@ -42,4 +42,12 @@ public interface JavaScriptFrameworkService {
      * @throws JavaScriptFrameworkNotFoundException if deleting entity doesn't exist
      */
     void deleteJavascriptFramework(Long id);
+
+    /**
+     * Search JavaScript frameworks by its name. It includes the framework if the given string value is found in
+     * framework's name. It's case insensitive.
+     *
+     * @return list of all JavaScript frameworks by its name.
+     */
+    List<JavaScriptFramework> searchJavaScriptFrameworks(String name);
 }

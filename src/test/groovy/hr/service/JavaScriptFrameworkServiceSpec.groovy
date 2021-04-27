@@ -111,4 +111,13 @@ class JavaScriptFrameworkServiceSpec extends Specification {
         thrown(JavaScriptFrameworkNotFoundException)
     }
 
+    def "Frameworks should be searched"() {
+        when:
+        def frameworks = javaScriptFrameworkService.searchJavaScriptFrameworks("vue")
+
+        then:
+        frameworks.size() == 1
+        1 * javaScriptFrameworkRepositoryMock.findByNameContainingIgnoreCase("vue") >> [new JavaScriptFramework()]
+    }
+
 }

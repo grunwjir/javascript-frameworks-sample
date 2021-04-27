@@ -27,7 +27,7 @@ public class JavaScriptFrameworkController {
 
     private final JavaScriptFrameworkService javaScriptFrameworkService;
 
-    @Operation(summary = "Provides all JavaScript frameworks and their versions")
+    @Operation(summary = "Provide all JavaScript frameworks and their versions")
     @GetMapping(value = "/frameworks")
     public List<JavaScriptFrameworkOut> frameworks() {
         return javaScriptFrameworkService.getJavaScriptFrameworks()
@@ -36,7 +36,7 @@ public class JavaScriptFrameworkController {
                 .collect(Collectors.toList());
     }
 
-    @Operation(summary = "Creates new JavaScript framework and their versions")
+    @Operation(summary = "Create new JavaScript framework and their versions")
     @PostMapping(value = "/frameworks")
     @ResponseStatus(HttpStatus.CREATED)
     public JavaScriptFrameworkOut createFramework(@RequestBody @Valid JavaScriptFrameworkIn javaScriptFramework) {
@@ -45,7 +45,7 @@ public class JavaScriptFrameworkController {
         return new JavaScriptFrameworkOut(created);
     }
 
-    @Operation(summary = "Updates existing JavaScript framework and their versions")
+    @Operation(summary = "Update existing JavaScript framework and their versions")
     @PutMapping(value = "/frameworks")
     public JavaScriptFrameworkOut updateFramework(@RequestBody @Valid JavaScriptFrameworkIn javaScriptFramework) {
         JavaScriptFramework created = javaScriptFrameworkService.updateJavascriptFramework(javaScriptFramework);
@@ -58,6 +58,15 @@ public class JavaScriptFrameworkController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteFramework(@PathVariable @NotNull Long id) {
         javaScriptFrameworkService.deleteJavascriptFramework(id);
+    }
+
+    @Operation(summary = "Search JavaScript frameworks having a name that contains the given string value.")
+    @GetMapping(value = "/frameworks/search")
+    public List<JavaScriptFrameworkOut> frameworks(@RequestParam String name) {
+        return javaScriptFrameworkService.searchJavaScriptFrameworks(name)
+                .stream()
+                .map(JavaScriptFrameworkOut::new)
+                .collect(Collectors.toList());
     }
 
 }

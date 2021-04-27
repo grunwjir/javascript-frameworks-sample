@@ -8,6 +8,7 @@ import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.jdbc.Sql
 import spock.lang.Specification
+import spock.lang.Unroll
 
 import java.time.LocalDate
 
@@ -22,6 +23,21 @@ class JavaScriptFrameworkRepositorySpec extends Specification {
 
     @Autowired
     JavaScriptFrameworkRepository javaScriptFrameworkRepository
+
+    @Sql("insert_records.sql")
+    @Unroll
+    def "Searching by '#name' should found #shouldFound record(s)"(String name, int shouldFound) {
+        expect:
+        javaScriptFrameworkRepository.findByNameContainingIgnoreCase(name).size() == shouldFound
+
+        where:
+        name  || shouldFound
+        "ang" || 1
+        "Ang" || 1
+        "abc" || 0
+        "NG"  || 2
+        ""    || 2
+    }
 
     @Sql("insert_records.sql")
     def "Two records should be found"() {
@@ -52,4 +68,5 @@ class JavaScriptFrameworkRepositorySpec extends Specification {
         frameworks != null
         frameworks.empty
     }
+
 }

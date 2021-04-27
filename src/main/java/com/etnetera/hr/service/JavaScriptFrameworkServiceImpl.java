@@ -75,6 +75,12 @@ public class JavaScriptFrameworkServiceImpl implements JavaScriptFrameworkServic
         javaScriptFrameworkRepository.deleteById(id);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<JavaScriptFramework> searchJavaScriptFrameworks(String name) {
+        return javaScriptFrameworkRepository.findByNameContainingIgnoreCase(name);
+    }
+
     /**
      * Map input objects to domain objects.
      *
